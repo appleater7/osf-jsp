@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Map;
+
+import com.google.gson.Gson;
 
 // 네이버 기계번역 (Papago SMT) API 예제
 public class Transfer {
@@ -14,7 +17,7 @@ public class Transfer {
         String clientId = "SHKLJtsdwjxjU2B7WrXU";//애플리케이션 클라이언트 아이디값";
         String clientSecret = "kfWtHRC9Kv";//애플리케이션 클라이언트 시크릿값";
         try {
-            String text = URLEncoder.encode("자바 비교적 쉽다.", "UTF-8");
+            String text = URLEncoder.encode("좋은 아침!", "UTF-8");
             String apiURL = "https://openapi.naver.com/v1/papago/n2mt";
             URL url = new URL(apiURL);
             HttpURLConnection con = (HttpURLConnection)url.openConnection();
@@ -22,7 +25,7 @@ public class Transfer {
             con.setRequestProperty("X-Naver-Client-Id", clientId);
             con.setRequestProperty("X-Naver-Client-Secret", clientSecret);
             // post request
-            String postParams = "source=ko&target=en&text=" + text;
+            String postParams = "source=ko&target=ja&text=" + text;
             con.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.writeBytes(postParams);
@@ -41,7 +44,13 @@ public class Transfer {
                 response.append(inputLine);
             }
             br.close();
-            System.out.println(response.toString());
+            Gson gson = new Gson();
+            Map<String, Object> result = gson.fromJson(response.toString(), Map.class);
+            Map<String, Object> mMap = (Map<String, Object>)result.get("message");
+            Map<String, Object> rMap = (Map<String, Object>)mMap.get("result");
+            System.out.println(rMap.get("translatedText"));
+            
+            System.out.println(response);
         } catch (Exception e) {
             System.out.println(e);
         }
